@@ -237,11 +237,18 @@ def pageNotifications() {
    def inputSpeechDevices = [
    name: "SpeechDevices", 
    type: "capability.speechSynthesis", 
-   title: "Which Speakers?", 
+   title: "Which speech devices?", 
    required: false, 
    multiple: true
    ]
    
+   def inputTTSDevices = [
+   name: "TTSDevices", 
+   type: "capability.musicPlayer", 
+   title: "Which TTS devices?", 
+   required: false, 
+   multiple: true
+   ]
 
    def inputSpeechText = [
     name:           "speechText",
@@ -279,6 +286,7 @@ def pageNotifications() {
     }
     section("Audio Notifications") {
       input inputSpeechDevices
+      input inputTTSDevices
       input inputSpeechText
     }
   }
@@ -479,19 +487,19 @@ private def notifyPushBullet(msg) {
  */
 private def notifyVoice(name) {
   LOG("notifyVoice(${name})")
-
-  if (!settings.SpeechDevices) {
-    return
-  }
-
+  
   // Replace %door with name
   def phrase = settings.speechText.replaceAll('%door', name)
 
-  if (phrase) {
+  if (SpeechDevices) {
         SpeechDevices.each() {
             it.speak(phrase)
         }
-    }
+        }
+  if (TTSDevices) {
+        settings.TTSDevices*.playText(phrase)
+  		}
+    
   }
 
 
